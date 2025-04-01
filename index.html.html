@@ -1,0 +1,242 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>量子世界動畫科普</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5;
+      font-family: Arial, sans-serif;
+    }
+    #container {
+      width: 800px;
+      margin: 50px auto;
+      background: #fff;
+      border: 1px solid #ddd;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    #canvas {
+      display: block;
+      background: #222;
+    }
+    #controls {
+      padding: 10px;
+      text-align: center;
+      background: #fafafa;
+      border-top: 1px solid #ddd;
+    }
+    button {
+      padding: 8px 16px;
+      margin: 0 10px;
+      border: none;
+      background: #007BFF;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:disabled {
+      background: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <canvas id="canvas" width="800" height="500"></canvas>
+    <div id="controls">
+      <button id="prevBtn">上一頁</button>
+      <button id="nextBtn">下一頁</button>
+      <button id="restartBtn" style="display:none;">返回第一頁</button>
+    </div>
+  </div>
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    let currentSlide = 0;
+
+    const slides = [
+      {
+        title: "量子世界簡介",
+        description: "就像在看極小極小的世界，小到連原子都看不清楚。我們正在探索比沙子還小的粒子世界。",
+        draw: function(time) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = "#fff";
+          ctx.font = "28px Arial";
+          ctx.fillText(this.title, 50, 50);
+          ctx.font = "18px Arial";
+          ctx.fillText(this.description, 50, 80);
+
+          ctx.beginPath();
+          ctx.arc(400, 250, 80, 0, Math.PI * 2);
+          ctx.strokeStyle = "#00ffcc";
+          ctx.lineWidth = 5;
+          ctx.stroke();
+          ctx.closePath();
+          ctx.fillStyle = "#ffcc00";
+          ctx.font = "16px Arial";
+          ctx.fillText("量子粒子像跳動的小點點", 250, 450);
+
+          let radius = 10 + 5 * Math.sin(time / 300);
+          ctx.beginPath();
+          ctx.arc(400 + Math.sin(time / 400) * 30, 250 + Math.cos(time / 400) * 30, radius, 0, Math.PI * 2);
+          ctx.fillStyle = "#ffcc00";
+          ctx.fill();
+        }
+      },
+      {
+        title: "波粒二象性",
+        description: "就像一個小朋友有時是跳舞的人、有時是飛舞的泡泡。光或電子可以是波，也可以是粒子。",
+        draw: function(time) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = "#fff";
+          ctx.font = "28px Arial";
+          ctx.fillText(this.title, 50, 50);
+          ctx.font = "18px Arial";
+          ctx.fillText(this.description, 50, 80);
+
+          ctx.beginPath();
+          ctx.strokeStyle = "#00ccff";
+          for (let x = 0; x < canvas.width; x += 5) {
+            let y = canvas.height / 2 + 30 * Math.sin((x + time / 5) * 0.05);
+            x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+
+          let particleX = (time / 2) % canvas.width;
+          let particleY = canvas.height / 2 + 30 * Math.sin((particleX + time / 5) * 0.05);
+          ctx.beginPath();
+          ctx.arc(particleX, particleY, 10, 0, Math.PI * 2);
+          ctx.fillStyle = "#ff6600";
+          ctx.fill();
+
+          ctx.font = "16px Arial";
+          ctx.fillStyle = "#00ccff";
+          ctx.fillText("波浪", 100, 200);
+          ctx.fillStyle = "#ff6600";
+          ctx.fillText("粒子", particleX + 12, particleY);
+        }
+      },
+      {
+        title: "量子疊加",
+        description: "像睡夢中夢到自己同時在看書、跑步、吃冰。量子粒子可以同時存在好幾個狀態。",
+        draw: function(time) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = "#fff";
+          ctx.font = "28px Arial";
+          ctx.fillText(this.title, 50, 50);
+          ctx.font = "18px Arial";
+          ctx.fillText(this.description, 50, 80);
+
+          for (let i = 0; i < 3; i++) {
+            let x = 300 + 120 * Math.cos(time / 1000 + i * 2);
+            let y = 250 + 120 * Math.sin(time / 1000 + i * 2);
+            ctx.beginPath();
+            ctx.arc(x, y, 20, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255, 100, 100, 0.5)`;
+            ctx.fill();
+            ctx.closePath();
+          }
+          ctx.font = "16px Arial";
+          ctx.fillStyle = "#ffa0a0";
+          ctx.fillText("它同時在這裡、那裡、那邊！", 250, 450);
+        }
+      },
+      {
+        title: "不確定性原理",
+        description: "像你想拍一隻飛快的貓，抓到位置就抓不到速度，抓到速度就模糊了位置。",
+        draw: function(time) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = "#fff";
+          ctx.font = "28px Arial";
+          ctx.fillText(this.title, 50, 50);
+          ctx.font = "18px Arial";
+          ctx.fillText(this.description, 50, 80);
+
+          let x = canvas.width / 2 + 50 * Math.cos(time / 500);
+          let y = canvas.height / 2 + 50 * Math.sin(time / 300);
+          ctx.beginPath();
+          ctx.arc(x, y, 20, 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+          ctx.fill();
+          ctx.closePath();
+
+          for (let i = 0; i < 10; i++) {
+            let offsetX = (Math.random() - 0.5) * 50;
+            let offsetY = (Math.random() - 0.5) * 50;
+            ctx.beginPath();
+            ctx.arc(x + offsetX, y + offsetY, 10, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(200, 200, 200, 0.2)";
+            ctx.fill();
+            ctx.closePath();
+          }
+          ctx.font = "16px Arial";
+          ctx.fillStyle = "#aaa";
+          ctx.fillText("越想看清楚，就越看不準！", 260, 450);
+        }
+      },
+      {
+        title: "總結與回顧",
+        description: "量子世界像童話世界一樣不可思議，但它真實存在著！點選下方按鈕可重新開始。",
+        draw: function(time) {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = "#fff";
+          ctx.font = "28px Arial";
+          ctx.fillText(this.title, 50, 50);
+          ctx.font = "18px Arial";
+          ctx.fillText(this.description, 50, 80);
+          ctx.beginPath();
+          ctx.rect(200, 150, 400, 200);
+          ctx.strokeStyle = "#00ff00";
+          ctx.lineWidth = 3;
+          ctx.stroke();
+          ctx.closePath();
+          ctx.font = "24px Arial";
+          ctx.fillStyle = "#00ff00";
+          ctx.fillText("你現在比以前更了解量子了！", 230, 250);
+        }
+      }
+    ];
+
+    function animate(time) {
+      slides[currentSlide].draw(time);
+      requestAnimationFrame(animate);
+    }
+    animate(0);
+
+    function updateButtons() {
+      prevBtn.disabled = currentSlide === 0;
+      if (currentSlide === slides.length - 1) {
+        nextBtn.style.display = "none";
+        restartBtn.style.display = "inline-block";
+      } else {
+        nextBtn.style.display = "inline-block";
+        restartBtn.style.display = "none";
+      }
+    }
+    updateButtons();
+
+    prevBtn.addEventListener("click", function() {
+      if (currentSlide > 0) {
+        currentSlide--;
+        updateButtons();
+      }
+    });
+    nextBtn.addEventListener("click", function() {
+      if (currentSlide < slides.length - 1) {
+        currentSlide++;
+        updateButtons();
+      }
+    });
+    restartBtn.addEventListener("click", function() {
+      currentSlide = 0;
+      updateButtons();
+    });
+  </script>
+</body>
+</html>
